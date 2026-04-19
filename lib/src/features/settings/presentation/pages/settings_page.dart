@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wallet/src/core/theme/theme_provider.dart';
 import 'package:wallet/src/core/user/presentation/provider/user_provider.dart';
+import 'package:wallet/src/features/auth/presentation/pages/register_page.dart';
 import 'package:wallet/src/common_widgets/shimmer_div.dart';
 import '../../../../common_widgets/app_text.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -179,6 +180,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             onPressed: () {
               Navigator.pop(ctx);
               ref.read(userProvider.notifier).logout();
+              // Navigate to root to ensure clean logout
+              Navigator.of(context).pushAndRemoveUntil(
+                CupertinoPageRoute(builder: (_) => const RegisterPage()),
+                (route) => false,
+              );
             },
             child: const Text('Sign Out'),
           ),

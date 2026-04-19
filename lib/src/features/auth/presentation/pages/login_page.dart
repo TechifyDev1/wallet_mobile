@@ -5,10 +5,12 @@ import 'package:wallet/src/features/auth/repository/auth_repository.dart';
 import 'package:wallet/src/features/main/presentation/pages/main_tabs.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../common_widgets/app_text.dart';
+import '../../../../core/utils/storage.dart';
 import '../widgets/auth_footer.dart';
 import '../widgets/auth_hero.dart';
 import '../widgets/login_form.dart';
 import 'register_page.dart';
+import 'setup_pin_page.dart';
 
 class LoginPage extends ConsumerWidget {
   const LoginPage({super.key});
@@ -62,9 +64,23 @@ class LoginPage extends ConsumerWidget {
                   await repository.login(email: email, password: password);
                   await ref.read(userProvider.notifier).refresh();
                   if (context.mounted) {
-                    Navigator.of(context).pushReplacement(
-                      CupertinoPageRoute(builder: (_) => const MainTabs()),
-                    );
+                    final isFirstTime =
+                        await Storage.read("isFirstTime") == "true";
+                    if (isFirstTime) {
+                      if (context.mounted) {
+                        Navigator.of(context).pushReplacement(
+                          CupertinoPageRoute(
+                            builder: (_) => const SetupPinPage(),
+                          ),
+                        );
+                      }
+                      return;
+                    }
+                    if (context.mounted) {
+                      Navigator.of(context).pushReplacement(
+                        CupertinoPageRoute(builder: (_) => const MainTabs()),
+                      );
+                    }
                   }
                 },
               ),

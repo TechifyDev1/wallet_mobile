@@ -13,6 +13,7 @@ class RegistrationForm extends StatefulWidget {
     String email,
     String password,
     String phoneNumber,
+    String secretKey,
   )
   onSubmit;
 
@@ -27,7 +28,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _phoneNumberController = TextEditingController();
+  final _secretKeyController = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureSecretKey = true;
 
   @override
   void dispose() {
@@ -37,6 +40,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
     _emailController.dispose();
     _passwordController.dispose();
     _phoneNumberController.dispose();
+    _secretKeyController.dispose();
+
     super.dispose();
   }
 
@@ -48,7 +53,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
         _usernameController.text.trim().isNotEmpty &&
         _emailController.text.trim().contains('@') &&
         _phoneNumberController.text.trim().length >= 7 &&
-        _passwordController.text.length >= 6;
+        _passwordController.text.length >= 6 &&
+        _secretKeyController.text.trim().isNotEmpty;
   }
 
   @override
@@ -182,6 +188,43 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 ),
                 showBorder: false,
               ),
+              _buildFormRow(
+                context: context,
+                label: 'Secret Key',
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CupertinoTextField(
+                        controller: _secretKeyController,
+                        placeholder: 'Required',
+                        textAlign: TextAlign.right,
+                        obscureText: _obscureSecretKey,
+                        style: const TextStyle(fontSize: 17),
+                        onChanged: (_) => setState(() {}),
+                        padding: EdgeInsets.zero,
+                        decoration: null,
+                      ),
+                    ),
+                    CupertinoButton(
+                      padding: const .only(left: 8),
+                      minimumSize: const Size(0, 0),
+                      onPressed: () {
+                        setState(() {
+                          _obscureSecretKey = !_obscureSecretKey;
+                        });
+                      },
+                      child: Icon(
+                        _obscureSecretKey
+                            ? CupertinoIcons.eye_slash_fill
+                            : CupertinoIcons.eye_fill,
+                        size: 20,
+                        color: AppColors.iosTextSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+                showBorder: false,
+              ),
             ],
           ),
         ),
@@ -214,6 +257,31 @@ class _RegistrationFormState extends State<RegistrationForm> {
           ),
         ),
         const SizedBox(height: 24),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                CupertinoIcons.exclamationmark_circle_fill,
+                color: CupertinoColors.systemOrange,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Important: Your secret key is crucial for account recovery. Keep it safe and memorize it. Never share it with anyone.',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: CupertinoColors.systemOrange,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
         AppButton(
           label: 'Create Account',
           onPressed: (_isLoading || !_isValid)
@@ -232,6 +300,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                           RegExp(r'[\s-]'),
                           '',
                         ),
+                        _secretKeyController.text.trim(),
                       );
                       if (context.mounted) {
                         Navigator.of(context).push(

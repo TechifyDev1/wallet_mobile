@@ -35,7 +35,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               AppText(
                 'Back',
-                variant: AppTextVariant.bodyLarge,
+                variant: .bodyLarge,
                 color: AppColors.getAccentColor(context),
               ),
             ],
@@ -44,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const .all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -64,6 +64,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       email,
                       password,
                       phoneNumber,
+                      secretKey,
                     ) async {
                       final repository = AuthRepository();
                       await repository.register(
@@ -73,6 +74,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         email: email,
                         password: password,
                         phoneNumber: phoneNumber,
+                        secretKey: secretKey,
                       );
                     },
               ),

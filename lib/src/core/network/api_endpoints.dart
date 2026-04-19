@@ -1,11 +1,12 @@
 class ApiEndpoints {
   // Using the host machine's Local IP address for physical device testing
 
-  static const String baseUrl = 'https://wallet-system-nbok.onrender.com/api';
+  static const String baseUrl = 'http://192.168.0.164:8080/api';
   static const String login = '$baseUrl/auth/login';
   static const String register = '$baseUrl/auth/register';
   static const String logout = '$baseUrl/auth/logout';
   static const String createPin = '$baseUrl/auth/set-pin';
+  static const String forgotPassword = '$baseUrl/auth/forgot-password';
   static const String getMe = '$baseUrl/user/me';
   static const String changeEmail = '$baseUrl/user/email/change';
   static const String changePhone = '$baseUrl/user/phone/change';

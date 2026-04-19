@@ -5,6 +5,7 @@ import 'package:wallet/src/core/network/http_client.dart';
 import 'package:wallet/src/core/theme/theme_provider.dart';
 import 'package:wallet/src/core/user/presentation/provider/user_provider.dart';
 import 'package:wallet/src/features/auth/presentation/pages/register_page.dart';
+import 'package:wallet/src/features/auth/repository/auth_repository.dart';
 import 'src/features/main/presentation/pages/main_tabs.dart';
 
 void main() {
@@ -22,7 +23,10 @@ class MyApp extends ConsumerStatefulWidget {
   ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends ConsumerState<MyApp> {
+class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
+  DateTime? _lastPausedTime;
+  final _sessionTimeout = Duration(minutes: 5);
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +34,35 @@ class _MyAppState extends ConsumerState<MyApp> {
     HttpClient.onUnauthorized = () {
       ref.read(userProvider.notifier).logout();
     };
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == .paused) {
+      _lastPausedTime = DateTime.now();
+    } else if (state == .resumed) {
+      if (_lastPausedTime != null) {
+        final pausedDuration = DateTime.now().difference(_lastPausedTime!);
+        if (pausedDuration > _sessionTimeout) {
+          debugPrint(
+            'App resumed after ${pausedDuration.inSeconds}s, logging out.',
+          );
+          AuthRepository().logout();
+          // Don't call _redirectToLogin() here - let the error state handle navigation
+        } else {
+          debugPrint(
+            'App resumed after ${pausedDuration.inSeconds}s, session still valid.',
+          );
+        }
+      }
+    }
   }
 
   @override

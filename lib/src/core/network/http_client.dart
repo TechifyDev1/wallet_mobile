@@ -35,8 +35,7 @@ class HttpClient extends http.BaseClient {
     final isAuthEndpoint =
         urlString.contains('auth/login') ||
         urlString.contains('auth/register') ||
-        urlString.contains('auth/logout') ||
-        urlString.contains('auth/set-pin');
+        urlString.contains('auth/logout');
 
     if (!isAuthEndpoint) {
       final token = await Storage.read('token');

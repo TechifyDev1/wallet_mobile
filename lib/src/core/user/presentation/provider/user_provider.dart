@@ -42,9 +42,9 @@ class UserNotifier extends AsyncNotifier<UserSummery> {
 
   Future<void> logout() async {
     await Storage.delete('token');
-    state = const AsyncValue.loading();
-    // Setting back to loading/uninitialized will cause main.dart to show RegisterPage
-    // due to the .when(error) logic or we can throw an error manually
+    await Storage.delete('isFirstTime');
+    // Don't set loading state to avoid triggering rebuilds
+    // Just set to error directly to show RegisterPage
     state = AsyncValue.error('Logged out', StackTrace.current);
   }
 }

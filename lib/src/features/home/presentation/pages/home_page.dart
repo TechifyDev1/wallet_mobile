@@ -1,18 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:wallet/src/core/user/presentation/provider/user_provider.dart';
-import 'package:wallet/src/features/home/model/recent_transaction_response.dart';
-import 'package:wallet/src/features/home/presentation/provider/recent_transaction_provider.dart';
+
 import '../../../../common_widgets/app_button.dart';
 import '../../../../common_widgets/app_text.dart';
+import '../../../../common_widgets/empty_state.dart';
+import '../../../../common_widgets/shimmer_div.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/user/presentation/provider/user_provider.dart';
 import '../../../activity/presentation/pages/transaction_detail_page.dart';
 import '../../../fund_wallet/presentation/pages/fund_wallet_page.dart';
-import 'package:wallet/src/features/send_money/presentation/pages/send_money_page.dart';
-import '../../../../common_widgets/shimmer_div.dart';
-import '../../../../common_widgets/empty_state.dart';
 import '../../../main/presentation/provider/main_nav_provider.dart';
+import '../../../send_money/presentation/pages/send_money_page.dart';
+import '../../model/recent_transaction_response.dart';
+import '../provider/recent_transaction_provider.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -68,14 +69,11 @@ class HomePage extends ConsumerWidget {
                     loading: () => SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) => Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: hp,
-                            vertical: 8,
-                          ),
+                          padding: .symmetric(horizontal: hp, vertical: 8),
                           child: ShimmerDiv(
-                            width: double.infinity,
+                            width: .infinity,
                             height: 60,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: .circular(12),
                           ),
                         ),
                         childCount: 4,
@@ -83,10 +81,10 @@ class HomePage extends ConsumerWidget {
                     ),
                     error: (err, _) => SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.all(hp),
+                        padding: .all(hp),
                         child: AppText(
                           'Could not load transactions.',
-                          variant: AppTextVariant.bodySmall,
+                          variant: .bodySmall,
                           color: AppColors.iosTextSecondary,
                         ),
                       ),
@@ -118,7 +116,7 @@ class _HomeHeader extends ConsumerWidget {
     );
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(hPad, 16, hPad, 16),
+      padding: .fromLTRB(hPad, 16, hPad, 16),
       child: Row(
         children: [
           // Avatar
@@ -126,7 +124,7 @@ class _HomeHeader extends ConsumerWidget {
             width: avatarSize,
             height: avatarSize,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
+              shape: .circle,
               color: AppColors.getCardColor(context),
               border: Border.all(
                 color: AppColors.getSeparatorColor(context),
@@ -146,16 +144,16 @@ class _HomeHeader extends ConsumerWidget {
           Expanded(
             child: userAsync.when(
               data: (summery) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: .start,
                 children: [
                   AppText(
                     'Welcome back,',
-                    variant: AppTextVariant.bodySmall,
+                    variant: .bodySmall,
                     color: AppColors.getTextSecondary(context),
                   ),
                   AppText(
                     '${summery.user.firstName} ${summery.user.lastName}',
-                    variant: AppTextVariant.bodyMedium,
+                    variant: .bodyMedium,
                     color: AppColors.getTextPrimary(context),
                   ),
                 ],
@@ -181,7 +179,7 @@ class _HomeHeader extends ConsumerWidget {
           ),
           // Notification bell
           CupertinoButton(
-            padding: EdgeInsets.zero,
+            padding: .zero,
             onPressed: () {},
             child: Stack(
               children: [
@@ -190,7 +188,7 @@ class _HomeHeader extends ConsumerWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     color: AppColors.getCardColor(context),
-                    shape: BoxShape.circle,
+                    shape: .circle,
                     border: Border.all(
                       color: AppColors.getSeparatorColor(context),
                       width: 0.5,
@@ -241,21 +239,21 @@ class _HomeBalanceCard extends ConsumerWidget {
     final balanceFontSize = (w * 0.087).clamp(28.0, 42.0);
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(hPad, 4, hPad, 0),
+      padding: .fromLTRB(hPad, 4, hPad, 0),
       child: Container(
-        width: double.infinity,
+        width: .infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(radius),
-          gradient: CupertinoTheme.brightnessOf(context) == Brightness.dark
+          gradient: CupertinoTheme.brightnessOf(context) == .dark
               ? AppColors.goldGradient
               : const LinearGradient(
                   colors: [Color(0xFF137FEC), Color(0xFF1A5FCC)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                  begin: .topLeft,
+                  end: .bottomRight,
                 ),
           boxShadow: [
             BoxShadow(
-              color: CupertinoTheme.brightnessOf(context) == Brightness.dark
+              color: CupertinoTheme.brightnessOf(context) == .dark
                   ? AppColors.primaryGold.withValues(alpha: 0.35)
                   : _primary.withValues(alpha: 0.35),
               blurRadius: 20,
@@ -273,7 +271,7 @@ class _HomeBalanceCard extends ConsumerWidget {
                 width: w * 0.33,
                 height: w * 0.33,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
+                  shape: .circle,
                   color: CupertinoColors.white.withValues(alpha: 0.08),
                 ),
               ),
@@ -291,32 +289,28 @@ class _HomeBalanceCard extends ConsumerWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(hPad),
+              padding: .all(hPad),
               child: userAsync.when(
                 data: (summery) => Column(
                   crossAxisAlignment: .start,
                   children: [
                     AppText(
                       'Total Balance',
-                      variant: AppTextVariant.bodySmall,
-                      color:
-                          CupertinoTheme.brightnessOf(context) ==
-                              Brightness.dark
+                      variant: .bodySmall,
+                      color: CupertinoTheme.brightnessOf(context) == .dark
                           ? const Color(0xFF523B00)
                           : const Color(0xFFBFDBFE),
                     ),
                     SizedBox(height: w * 0.015),
                     FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
+                      fit: .scaleDown,
+                      alignment: .centerLeft,
                       child: Text(
                         NumberFormat.simpleCurrency(
                           name: summery.wallet.currency,
                         ).format(summery.wallet.availableBalance.toDouble()),
                         style: TextStyle(
-                          color:
-                              CupertinoTheme.brightnessOf(context) ==
-                                  Brightness.dark
+                          color: CupertinoTheme.brightnessOf(context) == .dark
                               ? CupertinoColors.black
                               : CupertinoColors.white,
                           fontSize: balanceFontSize,
@@ -327,39 +321,12 @@ class _HomeBalanceCard extends ConsumerWidget {
                     ),
                     SizedBox(height: w * 0.07),
                     Row(
-                      mainAxisAlignment: .spaceBetween,
+                      mainAxisAlignment: .end,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: CupertinoColors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                CupertinoIcons.arrow_up_right,
-                                color: Color(0xFF86EFAC),
-                                size: 13,
-                              ),
-                              const SizedBox(width: 4),
-                              AppText(
-                                '+2.5%',
-                                variant: AppTextVariant.bodySmall,
-                                color: CupertinoColors.white,
-                              ),
-                            ],
-                          ),
-                        ),
                         AppText(
                           '**** ${summery.wallet.walletNumber.substring(summery.wallet.walletNumber.length - 4)}',
                           variant: AppTextVariant.bodySmall,
-                          color:
-                              CupertinoTheme.brightnessOf(context) ==
-                                  Brightness.dark
+                          color: CupertinoTheme.brightnessOf(context) == .dark
                               ? const Color(0xFF523B00)
                               : const Color(0xFFBFDBFE),
                         ),
@@ -368,32 +335,32 @@ class _HomeBalanceCard extends ConsumerWidget {
                   ],
                 ),
                 loading: () => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: .start,
                   children: [
                     ShimmerDiv(
                       width: 80,
                       height: 14,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: .circular(4),
                     ),
                     const SizedBox(height: 8),
                     ShimmerDiv(
                       width: 200,
                       height: balanceFontSize,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: .circular(4),
                     ),
                     const SizedBox(height: 24),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: .spaceBetween,
                       children: [
                         ShimmerDiv(
                           width: 60,
                           height: 24,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: .circular(8),
                         ),
                         ShimmerDiv(
                           width: 80,
                           height: 14,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: .circular(4),
                         ),
                       ],
                     ),
@@ -402,7 +369,7 @@ class _HomeBalanceCard extends ConsumerWidget {
                 error: (err, stack) => Center(
                   child: AppText(
                     'Error loading balance',
-                    variant: AppTextVariant.bodySmall,
+                    variant: .bodySmall,
                     color: CupertinoColors.white,
                   ),
                 ),

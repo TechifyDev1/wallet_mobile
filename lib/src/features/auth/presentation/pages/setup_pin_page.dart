@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../../../../common_widgets/app_button.dart';
 import '../../../../common_widgets/app_text.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../main/presentation/pages/main_tabs.dart';
 import '../../repository/auth_repository.dart';
 
 class SetupPinPage extends StatefulWidget {
@@ -144,7 +145,11 @@ class _SetupPinPageState extends State<SetupPinPage> {
         actions: [
           CupertinoDialogAction(
             isDefaultAction: true,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                CupertinoPageRoute(builder: (_) => const MainTabs()),
+              );
+            },
             child: const AppText('OK'),
           ),
         ],
@@ -224,17 +229,13 @@ class _SetupPinPageState extends State<SetupPinPage> {
               ),
               AppText(
                 'Back',
-                variant: AppTextVariant.bodyLarge,
+                variant: .bodyLarge,
                 color: AppColors.getAccentColor(context),
               ),
             ],
           ),
         ),
-        middle: AppText(
-          'Setup PIN',
-          variant: AppTextVariant.bodyLarge,
-          color: textColor,
-        ),
+        middle: AppText('Setup PIN', variant: .bodyLarge, color: textColor),
       ),
       child: SafeArea(
         child: Column(
@@ -249,16 +250,16 @@ class _SetupPinPageState extends State<SetupPinPage> {
                     // ── Title & subtitle ────────────────────────
                     AppText(
                       'Setup Transaction PIN',
-                      variant: AppTextVariant.displaySmall,
+                      variant: .displaySmall,
                       color: textColor,
-                      textAlign: TextAlign.center,
+                      textAlign: .center,
                     ),
                     const SizedBox(height: 8),
                     AppText(
                       'Create a secure 6-digit PIN to authorize\ntransfers and manage your wallet.',
-                      variant: AppTextVariant.bodySmall,
+                      variant: .bodySmall,
                       color: AppColors.iosTextSecondary,
-                      textAlign: TextAlign.center,
+                      textAlign: .center,
                     ),
                     const SizedBox(height: 28),
 

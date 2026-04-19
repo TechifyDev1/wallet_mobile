@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:wallet/src/features/auth/presentation/pages/forgot_password_page.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../common_widgets/app_button.dart';
 import 'forgot_password_button.dart';
@@ -164,7 +165,13 @@ class _LoginFormState extends State<LoginForm> {
       children: [
         formCard,
         const SizedBox(height: 12),
-        const ForgotPasswordButton(),
+        ForgotPasswordButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              CupertinoPageRoute(builder: (_) => const ForgotPasswordPage()),
+            );
+          },
+        ),
         const SizedBox(height: 24),
         AppButton(
           label: 'Sign In',
