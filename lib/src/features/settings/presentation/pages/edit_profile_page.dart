@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wallet/src/core/user/presentation/provider/user_provider.dart';
+import 'package:wallet/src/features/auth/presentation/pages/register_page.dart';
 import '../../../../common_widgets/app_text.dart';
 import '../../../../core/constants/app_colors.dart';
 import 'edit_name_page.dart';
 import 'edit_email_page.dart';
 import 'edit_phone_page.dart';
+import 'reset_password_page.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
   const EditProfilePage({super.key});
@@ -190,6 +192,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               context,
             ).push(CupertinoPageRoute(builder: (_) => const EditPhonePage())),
           ),
+          const _Divider(leftPadding: 16),
+          _buildPasswordRow(
+            () => Navigator.of(context).push(
+              CupertinoPageRoute(builder: (_) => const ResetPasswordPage()),
+            ),
+          ),
         ],
       ),
     );
@@ -218,6 +226,41 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 variant: AppTextVariant.bodyMedium,
                 color: AppColors.getTextSecondary(context),
                 overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Icon(
+              CupertinoIcons.chevron_right,
+              size: 16,
+              color: AppColors.getTextSecondary(context).withValues(alpha: 0.5),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordRow(VoidCallback onTap) {
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 100,
+              child: AppText(
+                'Password',
+                variant: AppTextVariant.bodyMedium,
+                fontWeight: FontWeight.w600,
+                color: AppColors.getTextPrimary(context),
+              ),
+            ),
+            Expanded(
+              child: AppText(
+                '••••••••',
+                variant: AppTextVariant.bodyMedium,
+                color: AppColors.getTextSecondary(context),
               ),
             ),
             Icon(
@@ -314,7 +357,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           child: CupertinoButton(
             color: AppColors.getCardColor(context),
             borderRadius: BorderRadius.circular(12),
-            onPressed: () {},
+            onPressed: _showLogoutDialog,
             child: const SizedBox(
               width: double.infinity,
               child: Center(
@@ -329,15 +372,47 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         ),
         const SizedBox(height: 24),
         CupertinoButton(
-          padding: EdgeInsets.zero,
+          padding: .zero,
           onPressed: () {},
           child: const AppText(
             'Freeze Account',
-            variant: AppTextVariant.bodySmall,
+            variant: .bodySmall,
             color: Color(0xFF94A3B8),
           ),
         ),
       ],
+    );
+  }
+
+  void _showLogoutDialog() {
+    showCupertinoDialog(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text(
+          'Are you sure you want to sign out from your account?',
+        ),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.pop(ctx);
+              ref.read(userProvider.notifier).logout();
+              // Navigate to root to ensure clean logout
+              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                CupertinoPageRoute(builder: (_) => const RegisterPage()),
+                (route) => false,
+              );
+            },
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
     );
   }
 }

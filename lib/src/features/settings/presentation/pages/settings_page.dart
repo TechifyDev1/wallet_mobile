@@ -181,7 +181,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               Navigator.pop(ctx);
               ref.read(userProvider.notifier).logout();
               // Navigate to root to ensure clean logout
-              Navigator.of(context).pushAndRemoveUntil(
+              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
                 CupertinoPageRoute(builder: (_) => const RegisterPage()),
                 (route) => false,
               );

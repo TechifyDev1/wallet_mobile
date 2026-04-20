@@ -29,8 +29,38 @@ class AuthRepository {
 
       if (response.statusCode == 200) {
         final token = responseData["token"];
-        if (token != null) {
+        final refreshTokenObj = responseData["refreshToken"];
+
+        // Extract token string from refreshToken object
+        final refreshTokenString =
+            refreshTokenObj != null && refreshTokenObj is Map
+            ? refreshTokenObj["token"]
+            : refreshTokenObj;
+
+        debugPrint('🎫 Login successful!');
+        debugPrint(
+          '📦 Token received: ${token != null ? '✓ Present (${token.substring(0, 20)}...)' : '✗ Missing'}',
+        );
+        debugPrint(
+          '🔄 RefreshToken received: ${refreshTokenString != null ? '✓ Present (${refreshTokenString.toString().substring(0, 20)}...)' : '✗ Missing'}',
+        );
+
+        if (token != null && token.isNotEmpty && refreshTokenString != null) {
           await Storage.write("token", token);
+          await Storage.write("refreshToken", refreshTokenString);
+          debugPrint('💾 Tokens saved to secure storage');
+
+          // Verify tokens were actually saved
+          final savedToken = await Storage.read('token');
+          final savedRefreshToken = await Storage.read('refreshToken');
+          debugPrint(
+            '✓ Token verification: ${savedToken != null ? 'Access Token saved ✅' : 'Access Token FAILED ❌'}',
+          );
+          debugPrint(
+            '✓ RefreshToken verification: ${savedRefreshToken != null ? 'Refresh Token saved ✅' : 'Refresh Token FAILED ❌'}',
+          );
+        } else {
+          debugPrint('❌ Missing token or refreshToken in response');
         }
         return responseData;
       } else {
@@ -134,8 +164,20 @@ class AuthRepository {
   }
 
   Future<void> logout() async {
+    try {
+      debugPrint('🚪 Logout initiated - calling backend logout endpoint');
+      final response = await HttpClient().post(Uri.parse(ApiEndpoints.logout));
+      debugPrint('📊 Logout Response Status: ${response.statusCode}');
+    } catch (e) {
+      debugPrint('⚠️ Backend logout failed (continuing local logout): $e');
+      // Continue with local logout even if backend call fails
+    }
+
+    debugPrint('💾 Clearing local tokens and storage');
     await Storage.delete("token");
+    await Storage.delete("refreshToken");
     await Storage.delete("isFirstTime");
+    debugPrint('✅ Local logout complete');
     HttpClient.onUnauthorized?.call();
   }
 
@@ -177,6 +219,47 @@ class AuthRepository {
       }
     } catch (e) {
       debugPrint("Forgot Password Error: $e");
+      if (e is String) rethrow;
+      throw 'Connection failed. Please check your internet.';
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPassword({
+    required String existingPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await HttpClient().post(
+        Uri.parse(ApiEndpoints.resetPassword),
+        body: jsonEncode({
+          'currentPassword': existingPassword,
+          'newPassword': newPassword,
+        }),
+      );
+
+      debugPrint("Reset Password Status Code: ${response.statusCode}");
+
+      Map<String, dynamic> responseData = {};
+      try {
+        if (response.body.isNotEmpty) {
+          responseData = jsonDecode(response.body);
+        }
+      } catch (e) {
+        debugPrint("Failed to decode response: ${response.body}");
+      }
+
+      if (response.statusCode == 200) {
+        return responseData;
+      } else {
+        final errorMessage =
+            responseData['detail'] ??
+            responseData['message'] ??
+            responseData['error'] ??
+            'Password reset failed (${response.statusCode})';
+        throw errorMessage;
+      }
+    } catch (e) {
+      debugPrint("Reset Password Error: $e");
       if (e is String) rethrow;
       throw 'Connection failed. Please check your internet.';
     }

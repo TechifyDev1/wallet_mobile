@@ -60,27 +60,58 @@ class LoginPage extends ConsumerWidget {
               const SizedBox(height: 40),
               LoginForm(
                 onSubmit: (email, password) async {
-                  final repository = AuthRepository();
-                  await repository.login(email: email, password: password);
-                  await ref.read(userProvider.notifier).refresh();
-                  if (context.mounted) {
-                    final isFirstTime =
-                        await Storage.read("isFirstTime") == "true";
-                    if (isFirstTime) {
+                  debugPrint('🔐 Login form submitted with email: $email');
+                  try {
+                    final repository = AuthRepository();
+                    await repository.login(email: email, password: password);
+                    debugPrint('✅ Login API call completed');
+
+                    // Small delay to ensure token is persisted before making next request
+                    await Future.delayed(const Duration(milliseconds: 100));
+                    debugPrint(
+                      '🔄 Calling userProvider.refresh() to fetch user data...',
+                    );
+
+                    try {
+                      await ref.read(userProvider.notifier).refresh();
+                      debugPrint('✅ userProvider.refresh() completed');
+                    } catch (refreshError) {
+                      debugPrint(
+                        '❌ userProvider.refresh() failed: $refreshError',
+                      );
+                      debugPrint(
+                        '⚠️ Continuing despite refresh error - user data may load later',
+                      );
+                      // Don't rethrow - continue to navigate anyway
+                      // The user data will be fetched when MainTabs requests it
+                    }
+
+                    if (context.mounted) {
+                      final isFirstTime =
+                          await Storage.read("isFirstTime") == "true";
+                      debugPrint('📋 isFirstTime: $isFirstTime');
+
+                      if (isFirstTime) {
+                        if (context.mounted) {
+                          debugPrint('➡️ Navigating to SetupPinPage');
+                          Navigator.of(context).pushReplacement(
+                            CupertinoPageRoute(
+                              builder: (_) => const SetupPinPage(),
+                            ),
+                          );
+                        }
+                        return;
+                      }
                       if (context.mounted) {
+                        debugPrint('➡️ Navigating to MainTabs');
                         Navigator.of(context).pushReplacement(
-                          CupertinoPageRoute(
-                            builder: (_) => const SetupPinPage(),
-                          ),
+                          CupertinoPageRoute(builder: (_) => const MainTabs()),
                         );
                       }
-                      return;
                     }
-                    if (context.mounted) {
-                      Navigator.of(context).pushReplacement(
-                        CupertinoPageRoute(builder: (_) => const MainTabs()),
-                      );
-                    }
+                  } catch (e) {
+                    debugPrint('❌ Login form onSubmit error: $e');
+                    rethrow; // Let the form handle the error display
                   }
                 },
               ),

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:wallet/src/core/user/model/user_summery.dart';
@@ -41,11 +42,18 @@ class UserNotifier extends AsyncNotifier<UserSummery> {
   }
 
   Future<void> logout() async {
-    await Storage.delete('token');
-    await Storage.delete('isFirstTime');
+    debugPrint('🚪 UserNotifier.logout() called');
+    try {
+      await Storage.delete('token');
+      await Storage.delete('refreshToken');
+      await Storage.delete('isFirstTime');
+    } catch (e) {
+      debugPrint('⚠️ Error clearing storage: $e');
+    }
     // Don't set loading state to avoid triggering rebuilds
     // Just set to error directly to show RegisterPage
     state = AsyncValue.error('Logged out', StackTrace.current);
+    debugPrint('✅ UserNotifier logout complete');
   }
 }
 
