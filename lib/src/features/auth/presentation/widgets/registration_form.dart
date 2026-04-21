@@ -308,7 +308,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
                         );
                       }
                     } catch (e) {
-                      debugPrint(e.toString());
                       if (context.mounted) {
                         showCupertinoDialog(
                           context: context,

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:wallet/src/core/network/api_endpoints.dart';
 import 'package:wallet/src/core/network/http_client.dart';
 import 'package:wallet/src/core/user/model/user_summery.dart';
@@ -14,24 +13,17 @@ class UserRepository {
 
   Future<UserSummery> getMe() async {
     try {
-      debugPrint('🔵 UserRepository.getMe() called');
-      debugPrint('📍 Endpoint: ${ApiEndpoints.getMe}');
       final response = await _http.get(Uri.parse(ApiEndpoints.getMe));
-      debugPrint('📊 getMe() Response Status: ${response.statusCode}');
-      debugPrint('📝 getMe() Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final parsedRes = jsonDecode(response.body);
         final finalRes = UserSummery.fromJson(parsedRes);
-        debugPrint('✅ Successfully parsed user data');
         return finalRes;
       }
-      debugPrint('❌ getMe() failed with status ${response.statusCode}');
       throw Exception(
         jsonDecode(response.body)["detail"] ?? "An error occurred",
       );
     } catch (e) {
-      debugPrint('❌ getMe() Exception: $e');
       rethrow;
     }
   }

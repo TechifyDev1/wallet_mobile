@@ -158,10 +158,9 @@ class FundSuccessPage extends StatelessWidget {
                     AppButton(
                       label: 'Done',
                       onPressed: () {
-                        // Pop back to Home
-                        Navigator.of(
-                          context,
-                        ).popUntil((route) => route.isFirst);
+                        // Pop back to MainTabs (go back 2 routes: FundSuccessPage -> FundWalletPage -> MainTabs)
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
                       },
                       size: AppButtonSize.large,
                     ),

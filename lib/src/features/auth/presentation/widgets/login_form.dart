@@ -50,12 +50,8 @@ class _LoginFormState extends State<LoginForm> {
     try {
       setState(() => _isLoading = true);
       await widget.onSubmit(email, password);
-      if (mounted) {
-        debugPrint("Success signing in");
-      }
     } catch (e) {
       if (mounted) {
-        debugPrint("Login error: $e");
         _showErrorDialog(e.toString());
       }
     } finally {

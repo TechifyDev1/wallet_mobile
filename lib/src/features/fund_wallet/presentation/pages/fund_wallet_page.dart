@@ -63,9 +63,14 @@ class _FundWalletPageState extends ConsumerState<FundWalletPage> {
       next.when(
         data: (response) {
           if (response != null) {
-            // Refresh data
-            unawaited(ref.read(recentTransactionProvider.notifier).refresh());
-            unawaited(ref.read(userProvider.notifier).refresh());
+            unawaited(
+              ref.read(recentTransactionProvider.notifier).refresh().onError((
+                error,
+                stackTrace,
+              ) {
+                return null;
+              }),
+            );
 
             Navigator.of(context).push(
               CupertinoPageRoute(

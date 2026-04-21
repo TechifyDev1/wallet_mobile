@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:wallet/src/core/network/api_endpoints.dart';
 import '../utils/storage.dart';
@@ -29,14 +28,8 @@ class HttpClient extends http.BaseClient {
   Future<void> _injectToken(http.BaseRequest request, bool isAuth) async {
     if (!isAuth) {
       final token = await Storage.read('token');
-      debugPrint(
-        '🔑 Token read from storage: ${token != null ? '✓ Present (${token.substring(0, 20)}...)' : '✗ Missing'}',
-      );
       if (token != null && token.isNotEmpty) {
         request.headers['Authorization'] = 'Bearer $token';
-        debugPrint('✅ Token injected into Authorization header');
-      } else {
-        debugPrint('⚠️ Token is null or empty, not injecting');
       }
     }
   }
@@ -62,7 +55,7 @@ class HttpClient extends http.BaseClient {
         return true;
       }
     } catch (e) {
-      debugPrint('HTTP Error during refresh: $e');
+      // Error during token refresh
     }
     return false;
   }
@@ -79,8 +72,7 @@ class HttpClient extends http.BaseClient {
     if (original is http.Request) {
       newRequest.bodyBytes = original.bodyBytes;
     } else if (original is http.MultipartRequest) {
-      // Note: Multipart retry is complex, usually requires re-opening files
-      debugPrint('Warning: Retry logic for MultipartRequest is limited.');
+      // Multipart retry is complex
     }
 
     return newRequest;
@@ -106,16 +98,11 @@ class HttpClient extends http.BaseClient {
 
     if ((response.statusCode == 401 || response.statusCode == 403) &&
         !isAuthEndpoint) {
-      debugPrint(
-        'Received ${response.statusCode} for ${request.url}. Attempting token refresh.',
-      );
       final refreshed = await _handleTokenRefresh();
       if (refreshed) {
-        debugPrint('Token refreshed successfully. Retrying original request.');
         final newRequest = await _copyRequest(request);
         return _inner.send(newRequest);
       } else {
-        debugPrint('Token refresh failed. Clearing tokens and notifying app.');
         await Storage.delete('token');
         await Storage.delete('refreshToken');
       }

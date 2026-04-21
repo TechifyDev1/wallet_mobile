@@ -46,7 +46,12 @@ class FundWalletNotifier extends AsyncNotifier<FundWalletResponse?> {
       _idempotencyKey = null;
 
       state = AsyncData(response);
-      ref.read(userProvider.notifier).refresh();
+
+      try {
+        await ref.read(userProvider.notifier).refresh();
+      } catch (e) {
+        // Refresh failed but fund was successful
+      }
     } catch (e, st) {
       state = AsyncError(e, st);
     }
